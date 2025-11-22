@@ -9,10 +9,16 @@ class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
-    username = Column(String)
-    # 프로필 정보
-    age = Column(Integer, nullable=True)
-    region = Column(String, nullable=True)
+    username = Column(String)  # 사용자 이름
+
+    # --- [추가] 프로필 입력 정보 ---
+    age = Column(Integer, nullable=True)  # 나이
+    gender = Column(String, nullable=True)  # 성별 (남/여)
+    region = Column(String, nullable=True)  # 거주지 (서울, 경기 등)
+    housing_type = Column(String, nullable=True)  # 거주 형태 (월세, 전세, 기숙사 등)
+    monthly_income = Column(Integer, nullable=True)  # 월 평균 소득 (만원 단위)
+    school = Column(String, nullable=True)  # 학교
+    # ---------------------------
 
     chats = relationship("ChatHistory", back_populates="user")
     progresses = relationship("UserWelfareProgress", back_populates="user")
