@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import welfyImg from "../assets/images/welfy_origin.png";
+import welfyLogo from "../assets/images/welfy_logo.png";
 import googleLogo from "../assets/images/google_logo.png";
 
 export default function LoginPage() {
@@ -23,20 +24,20 @@ export default function LoginPage() {
       }}
     >
       {/* 헤더 */}
-      <div style={{ textAlign: "center", marginBottom: "30px" }}>
+      <div style={{ textAlign: "center", marginBottom: "10px" }}>
         <h2 style={{ fontSize: "28px", fontWeight: "500", color: "#123B66", margin: 0 }}>
           복지에 특화된 AI 비서,
         </h2>
-        <h1
+        <img
+          src={welfyLogo}
+          alt="Welfy 로고"
           style={{
-            fontSize: "56px",
-            fontWeight: "800",
-            color: "#123B66",
-            margin: "10px 0",
+            display: "block",
+            width: "300px",
+            height: "auto",
+            margin: "0 auto 0",
           }}
-        >
-          Welfy
-        </h1>
+        />
       </div>
 
       {/* 캐릭터 + 말풍선 */}
