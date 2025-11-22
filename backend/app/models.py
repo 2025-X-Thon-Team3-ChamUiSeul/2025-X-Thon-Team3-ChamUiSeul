@@ -40,11 +40,26 @@ class Welfare(Base):
 # 3. 진행 상황 테이블 (누가, 무엇을, 얼마나 진행했나)
 class UserWelfareProgress(Base):
     __tablename__ = "user_welfare_progress"
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     welfare_id = Column(String, ForeignKey("welfares.service_id"))
-    step = Column(Integer, default=0)  # 0:관심, 1:서류, 2:신청...
-    is_completed = Column(Boolean, default=False)
+
+    # --- [추가/수정된 필드] ---
+    status = Column(
+        String, default="Active"
+    )  # 신청 상태 (Active, Completed, Cancelled 등)
+    total_steps = Column(
+        Integer, default=0
+    )  # 총 단계 수 (예: 4). 시각화 그래프의 전체 크기
+    current_step = Column(
+        Integer, default=1
+    )  # 현재 진행 단계 (예: 2). 시각화 그래프의 현재 위치
+    next_action_description = Column(
+        Text, nullable=True
+    )  # 다음 단계에서 사용자가 해야 할 구체적인 행동 안내 (AI 안내문)
+    # -----------------------
+
     last_updated = Column(DateTime, default=datetime.now)
 
     user = relationship("User", back_populates="progresses")
