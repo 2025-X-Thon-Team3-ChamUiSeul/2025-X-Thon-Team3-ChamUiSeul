@@ -15,12 +15,34 @@ frontend/dist/
 frontend/.env
 frontend/.env.local
 
-# --- Backend (Spring Boot/Java) ---
-backend/spring-api-server/target/
-backend/spring-api-server/.mvn/wrapper/maven-wrapper.properties
-backend/spring-api-server/.idea/
-backend/spring-api-server/.vscode/
-*.class
+# 1. 파이썬 필수 제외 (캐시 파일)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 2. 가상환경 (내 컴퓨터용 공구함)
+venv/
+backend/venv/
+env/
+.venv/
+
+# 3. 비밀번호 및 환경설정 (보안)
+.env
+.env.*
+backend/.env
+
+# 4. 데이터베이스 (로컬 파일 & 벡터 DB)
+*.db
+*.sqlite3
+chroma_db/
+
+# 5. 운영체제 잡동사니 (맥/윈도우)
+.DS_Store
+Thumbs.db
+
+# 6. VS Code 설정 (팀원끼리 설정 다를 수 있음)
+.vscode/
 
 # --- Backend (FastAPI/Python) ---
 backend/fastapi-ai-agent/__pycache__/
