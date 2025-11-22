@@ -164,8 +164,6 @@ export default function ChatPage() {
   return (
     <ChatLayout handleNewChat={handleNewChat} sessions={sessions} loadChat={loadChat}>
       <div className="chat-container">
-        {messages.length > 0 && <StepIndicator current={3} />}
-
         {messages.length === 0 && (
           <div className="intro-wrapper">
             <img src={welfyImg} alt="welfy" className="intro-welfy" />
