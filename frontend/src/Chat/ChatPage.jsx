@@ -10,6 +10,7 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(false); // ⬅️ 로딩 상태 추가
+  const [sessions, setSessions] = useState([]); // New state for sessions
 
   // 컴포넌트가 처음 로드될 때 URL에서 토큰과 유저 정보를 추출합니다.
   useEffect(() => {
@@ -35,10 +36,78 @@ export default function ChatPage() {
         setUserName(storedName);
       }
     }
+    
+    fetchHistory();
   }, []);
+
+  const fetchHistory = async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+
+    try {
+      const response = await fetch("http://localhost:8000/chat/history", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const history = await response.json();
+      processHistory(history);
+
+    } catch (error) {
+      console.error("Failed to fetch chat history:", error);
+    }
+  };
+
+  const processHistory = (history) => {
+    if (!history || history.length === 0) {
+      setSessions([]);
+      return;
+    }
+
+    const sortedHistory = [...history].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+    const sessionGroups = [];
+    if (sortedHistory.length > 0) {
+        // Start first session
+        let currentSession = { id: sortedHistory[0].id, title: sortedHistory[0].message, messages: [] };
+        sessionGroups.push(currentSession);
+
+        for (let i = 0; i < sortedHistory.length; i++) {
+            const item = sortedHistory[i];
+
+            if (i > 0) {
+                const prevTimestamp = new Date(sortedHistory[i - 1].timestamp);
+                const currentTimestamp = new Date(item.timestamp);
+                const diffMinutes = (currentTimestamp - prevTimestamp) / (1000 * 60);
+
+                if (diffMinutes > 60) {
+                    // Time gap is large, start a new session
+                    currentSession = { id: item.id, title: item.message, messages: [] };
+                    sessionGroups.push(currentSession);
+                }
+            }
+            // Add message pair to the current session (the last one in the array)
+            currentSession.messages.push({ sender: 'user', text: item.message });
+            currentSession.messages.push({ sender: 'bot', text: item.response });
+        }
+    }
+
+    setSessions(sessionGroups.reverse());
+  };
+
+  const loadChat = (session) => {
+    setMessages(session.messages);
+  };
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return; // ⬅️ 로딩 중이면 전송 방지
+
+    const isNewChat = messages.length === 0;
 
     const userMsg = { sender: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
@@ -65,6 +134,10 @@ export default function ChatPage() {
       const botMsg = { sender: "bot", text: data.response }; // ⬅️ API 응답 사용
       setMessages((prev) => [...prev, botMsg]);
 
+      if (isNewChat) {
+        await fetchHistory();
+      }
+
     } catch (error) {
       console.error("API Error:", error);
       const errorMsg = {
@@ -89,7 +162,7 @@ export default function ChatPage() {
   };
 
   return (
-    <ChatLayout handleNewChat={handleNewChat}>
+    <ChatLayout handleNewChat={handleNewChat} sessions={sessions} loadChat={loadChat}>
       <div className="chat-container">
         {messages.length === 0 && (
           <div className="intro-wrapper">
