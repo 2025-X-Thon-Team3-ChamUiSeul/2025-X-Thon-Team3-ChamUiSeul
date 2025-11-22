@@ -8,9 +8,10 @@ import "./ChatPage.css";
 export default function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [userName, setUserName] = useState(""); // ⬅️ 유저 이름 상태 추가
+  const [userName, setUserName] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // ⬅️ 로딩 상태 추가
 
-  //  컴포넌트가 처음 로드될 때 URL에서 토큰과 유저 정보를 추출합니다.
+  // 컴포넌트가 처음 로드될 때 URL에서 토큰과 유저 정보를 추출합니다.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
@@ -37,43 +38,42 @@ export default function ChatPage() {
   }, []);
 
   const sendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return; // ⬅️ 로딩 중이면 전송 방지
 
     const userMsg = { sender: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
+    setIsLoading(true); // ⬅️ 로딩 시작
 
-    // 웰피의 답장을 받기 위한 API 호출 (예시)
+    // 웰피의 답장을 받기 위한 API 호출
     try {
       const token = localStorage.getItem("authToken");
-      /* 
-      // 📣 [API 호출 예시] 나중에 실제 API 엔드포인트로 교체하세요.
-      const response = await fetch("http://localhost:8000/api/chat", {
+      const response = await fetch("http://localhost:8000/chat/message", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // ⬅️ 헤더에 토큰 추가
+          Authorization: `Bearer ${token}`, // ⬅️ 헤더에 토큰 추가
         },
         body: JSON.stringify({ message: input }),
       });
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      const data = await response.json();
-      const botMsg = { sender: "bot", text: data.reply };
-      */
 
-      // 임시 자동 답장
-      const botMsg = { sender: "bot", text: "웰피의 자동 답장이에요!" };
-      
+      const data = await response.json();
+      const botMsg = { sender: "bot", text: data.response }; // ⬅️ API 응답 사용
       setMessages((prev) => [...prev, botMsg]);
 
     } catch (error) {
       console.error("API Error:", error);
-      const errorMsg = { sender: "bot", text: "죄송해요, 오류가 발생했어요." };
+      const errorMsg = {
+        sender: "bot",
+        text: "죄송해요, 답변을 생성하는 중에 오류가 발생했어요.",
+      };
       setMessages((prev) => [...prev, errorMsg]);
+    } finally {
+      setIsLoading(false); // ⬅️ 로딩 종료
     }
   };
 
@@ -124,7 +124,11 @@ export default function ChatPage() {
             onKeyDown={handleKey}
             placeholder="무엇이든 물어보세요."
           />
-          <button onClick={sendMessage} className="send-btn">
+          <button
+            onClick={sendMessage}
+            className={`send-btn ${isLoading ? "sending" : ""}`}
+            disabled={isLoading}
+          >
             <svg
               width="26"
               height="26"
