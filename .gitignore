@@ -1,0 +1,28 @@
+# --- Global ---
+.DS_Store
+*.log
+
+# --- Frontend (Node/React) ---
+frontend/node_modules/
+frontend/.next/
+frontend/build/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# --- Backend (Spring Boot/Java) ---
+backend/spring-api-server/target/
+backend/spring-api-server/.mvn/wrapper/maven-wrapper.properties
+backend/spring-api-server/.idea/
+backend/spring-api-server/.vscode/
+*.class
+
+# --- Backend (FastAPI/Python) ---
+backend/fastapi-ai-agent/__pycache__/
+backend/fastapi-ai-agent/venv/
+backend/fastapi-ai-agent/.env
+backend/fastapi-ai-agent/*.pyc
+
+# --- Secret Keys (절대 올리지 말 것) ---
+secrets.json
+key.pem
