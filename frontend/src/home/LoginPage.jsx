@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import welfyImg from "../assets/images/welfy_origin.png";
+import googleLogo from "../assets/images/google_logo.png";
 
 export default function LoginPage() {
   const navigate = useNavigate();
 
   const handleGoogleLogin = () => {
-    // 백엔드의 구글 로그인 처리 라우터로 이동
+    // 백엔드의 구글 로그인 처리 라우트로 이동
     window.location.href = "http://localhost:8000/auth/login";
   };
 
@@ -21,10 +22,10 @@ export default function LoginPage() {
         backgroundColor: "#F5F9FF",
       }}
     >
-      {/* 타이틀 */}
+      {/* 헤더 */}
       <div style={{ textAlign: "center", marginBottom: "30px" }}>
         <h2 style={{ fontSize: "28px", fontWeight: "500", color: "#123B66", margin: 0 }}>
-          청년을 위한 AI 비서,
+          복지에 특화된 AI 비서,
         </h2>
         <h1
           style={{
@@ -72,29 +73,42 @@ export default function LoginPage() {
         >
           <strong style={{ fontSize: "18px" }}>Welcome!</strong> <br />
           복잡한 복지, 이젠 <br />
-          웰피가 알려줄게요.
+          웰피가 알려줄게요!
         </div>
       </div>
 
       {/* 로그인 버튼 */}
       <button
         onClick={handleGoogleLogin}
+        aria-label="구글로 로그인"
         style={{
-          backgroundColor: "#123B66",
-          color: "white",
+          backgroundColor: "white",
           border: "none",
-          padding: "18px 50px",
-          borderRadius: "40px",
-          fontSize: "20px",
-          fontWeight: "600",
+          padding: 0,
+          borderRadius: "20px",
           cursor: "pointer",
-          boxShadow: "0px 4px 8px rgba(0,0,0,0.15)",
-          transition: "0.2s",
+          boxShadow: "0px 6px 12px rgba(0,0,0,0.18)",
+          transition: "transform 0.15s ease, box-shadow 0.15s ease",
         }}
-        onMouseOver={(e) => (e.target.style.backgroundColor = "#0F2F52")}
-        onMouseOut={(e) => (e.target.style.backgroundColor = "#123B66")}
+        onMouseOver={(e) => {
+          e.currentTarget.style.transform = "translateY(-2px)";
+          e.currentTarget.style.boxShadow = "0px 8px 16px rgba(0,0,0,0.22)";
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "0px 6px 12px rgba(0,0,0,0.18)";
+        }}
       >
-        구글로 로그인
+        <img
+          src={googleLogo}
+          alt="Google 로그인"
+          style={{
+            display: "block",
+            width: "210px",
+            height: "auto",
+            borderRadius: "20px",
+          }}
+        />
       </button>
     </div>
   );
