@@ -1,4 +1,4 @@
-export default function Sidebar() {
+export default function Sidebar({ handleNewChat }) {
   return (
     <div
       style={{
@@ -15,7 +15,22 @@ export default function Sidebar() {
       </h1>
 
       <nav style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-        <div style={{ fontSize: "20px" }}>새 채팅</div>
+        <button
+          onClick={handleNewChat}
+          style={{
+            fontSize: "20px",
+            backgroundColor: "#ffffff",
+            border: "1px solid #123B66",
+            borderRadius: "8px",
+            padding: "10px 15px",
+            cursor: "pointer",
+            color: "#123B66",
+            textAlign: "left",
+            width: "100%",
+          }}
+        >
+          + 새 채팅
+        </button>
         <div style={{ fontSize: "20px" }}>내 정보</div>
         <div style={{ marginTop: "40px", fontSize: "20px" }}>내 채팅</div>
         <span style={{ color: "#345575" }}>과거 채팅 기록들…</span>
