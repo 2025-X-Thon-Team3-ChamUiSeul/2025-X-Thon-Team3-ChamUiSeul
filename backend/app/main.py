@@ -1,7 +1,12 @@
 # backend/app/main.py
 
 from fastapi import FastAPI
-from app.routers import auth, user, chat  # <--- 1. 여기 'chat'을 임포트했는지 확인
+from app.routers import (
+    auth,
+    user,
+    chat,
+    progress,
+)
 
 app = FastAPI(title="Welfy API", version="1.0.0")
 

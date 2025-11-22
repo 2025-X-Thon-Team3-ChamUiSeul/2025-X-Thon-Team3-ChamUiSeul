@@ -7,6 +7,7 @@ from app.models import UserWelfareProgress, Welfare, User
 from app.schemas import ProgressStartResponse, ProgressCompletion
 from app.dependencies import get_current_user
 from datetime import datetime
+from typing import List
 
 router = APIRouter(prefix="/progress", tags=["progress"])
 
