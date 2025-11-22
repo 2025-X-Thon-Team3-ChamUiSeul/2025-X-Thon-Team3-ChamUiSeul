@@ -1,6 +1,8 @@
 # --- Global ---
 .DS_Store
 *.log
+.env             # <- 이렇게 추가하면 모든 폴더의 .env를 무시합니다 (추천)
+backend/.env     # <- 혹은 이렇게 특정 경로만 추가해도 됩니다
 
 # --- Frontend (Node/React) ---
 frontend/node_modules/
