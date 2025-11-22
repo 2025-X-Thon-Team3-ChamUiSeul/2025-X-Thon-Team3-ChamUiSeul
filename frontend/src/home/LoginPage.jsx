@@ -50,8 +50,8 @@ export default function LoginPage() {
           src={welfyImg}
           alt="welfy"
           style={{
-            width: "170px",
-            height: "170px",
+            width: "220px",
+            height: "220px",
             objectFit: "contain",
           }}
         />
