@@ -11,3 +11,4 @@ google-generativeai
 langchain
 langchain-google-genai
 chromadb
+langchain-chroma
