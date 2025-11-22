@@ -1,4 +1,3 @@
-# backend/app/routers/auth.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse
@@ -68,8 +67,9 @@ def auth_google_callback(code: str, db: Session = Depends(get_db)):
     }
     jwt_token = jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
-    return {
-        "message": "Login Success",
-        "user": {"email": email, "name": username},
-        "token": jwt_token,
-    }
+    # ✅ 프론트엔드로 리다이렉트 (토큰을 URL 파라미터로 전달)
+    frontend_url = "http://localhost:5173"  # Vite 개발 서버 주소
+    return RedirectResponse(
+        url=f"{frontend_url}/chat?token={jwt_token}&email={email}&name={username}",
+        status_code=302,
+    )
