@@ -1,0 +1,114 @@
+/* ChatPage 전체 (오른쪽 내용 영역) */
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 40px;
+  overflow: hidden;
+  height: 100%; /* ✅ 추가 – ChatLayout 안에서 전체 채우기 */
+}
+
+/* 메시지 목록 */
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 메시지 줄 */
+.msg {
+  display: flex;
+  align-items: flex-start;
+}
+
+.msg.bot {
+  flex-direction: row;
+}
+
+.msg.user {
+  flex-direction: row-reverse;
+}
+
+/* 웰피 아이콘 */
+.welfy-icon {
+  width: 55px;
+  margin: 0 10px;
+}
+
+/* 말풍선 */
+.bubble {
+  padding: 14px 20px;
+  border-radius: 14px;
+  font-size: 16px;
+  max-width: 350px;
+}
+
+.bubble.bot {
+  background: white;
+  border: 3px solid #123B66;
+}
+
+.bubble.user {
+  background: white;
+  border: 3px solid #A8C7FF;
+}
+
+/* 입력창 */
+.input-bar {
+  display: flex;
+  align-items: center;
+  background: #dce7fb;
+  padding: 14px 18px;
+  border-radius: 40px;
+  margin-top: 10px;
+}
+
+.input-bar input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+}
+
+.send-btn {
+  width: 50px;
+  height: 50px;
+  background: #123B66;
+  color: white;
+  border-radius: 50%;
+  font-size: 26px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- 인트로 화면 --- */
+.intro-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 60px;
+  color: #123B66;
+}
+
+.intro-welfy {
+  width: 160px;
+  margin-bottom: 20px;
+}
+
+.intro-text {
+  font-size: 32px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* 🔵 인트로 화면일 때 입력창을 아래로 더 내리기 */
+.input-bar.intro-bottom {
+  margin-top: 120px;  /* 원하는 만큼 조절 가능 */
+}
