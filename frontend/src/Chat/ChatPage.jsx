@@ -1,33 +1,84 @@
 // src/Chat/ChatPage.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import StepIndicator from "../Components/StepIndicator";
 import ChatLayout from "../Components/ChatLayout";
 import welfyImg from "../assets/images/welfy_origin.png";
 import "./ChatPage.css";
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState([]);        // ← 처음엔 아무 메시지도 없음
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [userName, setUserName] = useState(""); // ⬅️ 유저 이름 상태 추가
 
-  const sendMessage = () => {
+  //  컴포넌트가 처음 로드될 때 URL에서 토큰과 유저 정보를 추출합니다.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    const name = params.get("name");
+    const email = params.get("email");
+
+    if (token) {
+      // 토큰과 유저 정보를 로컬 스토리지에 저장하여 로그인 상태를 유지합니다.
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("userName", name);
+      localStorage.setItem("userEmail", email);
+
+      setUserName(name); // 상태 업데이트
+
+      // URL에서 토큰 정보를 제거하여 주소를 깔끔하게 정리합니다.
+      window.history.replaceState({}, document.title, "/chat");
+    } else {
+      // 페이지 새로고침 시 로컬 스토리지에서 유저 정보 불러오기
+      const storedName = localStorage.getItem("userName");
+      if (storedName) {
+        setUserName(storedName);
+      }
+    }
+  }, []);
+
+  const sendMessage = async () => {
     if (!input.trim()) return;
 
     const userMsg = { sender: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
-
-    // 웰피 자동 답장 (첫 메시지를 보낸 후에만 실행됨)
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", text: "웰피의 자동 답장이에요!" },
-      ]);
-    }, 500);
-
     setInput("");
+
+    // 웰피의 답장을 받기 위한 API 호출 (예시)
+    try {
+      const token = localStorage.getItem("authToken");
+      /* 
+      // 📣 [API 호출 예시] 나중에 실제 API 엔드포인트로 교체하세요.
+      const response = await fetch("http://localhost:8000/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // ⬅️ 헤더에 토큰 추가
+        },
+        body: JSON.stringify({ message: input }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      
+      const data = await response.json();
+      const botMsg = { sender: "bot", text: data.reply };
+      */
+
+      // 임시 자동 답장
+      const botMsg = { sender: "bot", text: "웰피의 자동 답장이에요!" };
+      
+      setMessages((prev) => [...prev, botMsg]);
+
+    } catch (error) {
+      console.error("API Error:", error);
+      const errorMsg = { sender: "bot", text: "죄송해요, 오류가 발생했어요." };
+      setMessages((prev) => [...prev, errorMsg]);
+    }
   };
 
   const handleKey = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
       e.preventDefault();
       sendMessage();
     }
@@ -36,21 +87,20 @@ export default function ChatPage() {
   return (
     <ChatLayout>
       <div className="chat-container">
-
-        {/* 🔵 메시지가 있을 때만 단계바 표시 */}
         {messages.length > 0 && <StepIndicator current={3} />}
 
-        {/* 🔵 첫 메시지를 보내기 전 → 인트로 화면 */}
         {messages.length === 0 && (
           <div className="intro-wrapper">
             <img src={welfyImg} alt="welfy" className="intro-welfy" />
             <div className="intro-text">
+              {/* ⬅️ 로그인한 유저 이름 표시 */}
+              {userName ? `${userName}님, 안녕하세요!` : "안녕하세요!"}
+              <br />
               서류의 숲에서 웰피가 길을 찾아줄게요.
             </div>
           </div>
         )}
 
-        {/* 🔵 메시지가 있는 경우만 채팅 영역을 보여줌 */}
         {messages.length > 0 && (
           <div className="messages">
             {messages.map((msg, idx) => (
@@ -67,7 +117,6 @@ export default function ChatPage() {
           </div>
         )}
 
-        {/* 입력창 */}
         <div className={`input-bar ${messages.length === 0 ? "intro-bottom" : ""}`}>
           <input
             value={input}

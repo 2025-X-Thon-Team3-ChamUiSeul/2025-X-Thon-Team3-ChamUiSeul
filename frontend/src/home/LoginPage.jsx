@@ -5,7 +5,8 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   const handleGoogleLogin = () => {
-    navigate("/info"); // 로그인 후 정보 입력 화면으로 이동
+    // 백엔드의 구글 로그인 처리 라우터로 이동
+    window.location.href = "http://localhost:8000/auth/login";
   };
 
   return (
