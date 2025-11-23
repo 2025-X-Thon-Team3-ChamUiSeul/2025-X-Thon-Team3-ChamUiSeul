@@ -150,3 +150,120 @@
     transform: translateY(-4px);
   }
 }
+
+/* --- 서류 작성 진행도 --- */
+.progress-card {
+  background: #f7fbff;
+  border: 2px solid #b1d5ff;
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 6px 16px rgba(18, 59, 102, 0.08);
+}
+
+.progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.progress-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #123b66;
+}
+
+.progress-service {
+  font-size: 14px;
+  color: #37689f;
+  margin-top: 2px;
+}
+
+.progress-welfy {
+  width: 46px;
+  height: 46px;
+}
+
+.progress-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 8px 4px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.progress-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  padding-bottom: 18px;
+}
+
+.progress-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid #123b66;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #123b66;
+  background: white;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.progress-circle.active {
+  background: #8dc6ff;
+  color: #123b66;
+  transform: translateY(-2px);
+}
+
+.progress-circle.done {
+  background: #123b66;
+  color: white;
+}
+
+.progress-line {
+  flex: 1;
+  height: 3px;
+  background: #c6ddf9;
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+
+.progress-line.active,
+.progress-line.done {
+  background: #123b66;
+}
+
+.progress-label {
+  font-size: 12px;
+  color: #5178a5;
+  position: absolute;
+  top: 38px;
+  left: 2px;
+}
+
+.progress-next {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #e2efff;
+  border-radius: 10px;
+  color: #123b66;
+  font-size: 14px;
+}
+
+.progress-next-label {
+  font-weight: 700;
+  color: #0c2f55;
+}
+
+.progress-next-text {
+  flex: 1;
+  color: #205a92;
+}
