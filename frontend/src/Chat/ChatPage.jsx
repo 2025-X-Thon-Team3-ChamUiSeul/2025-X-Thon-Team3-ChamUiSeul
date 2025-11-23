@@ -1,6 +1,5 @@
 // src/Chat/ChatPage.jsx
 import { useState, useEffect } from "react";
-import StepIndicator from "../Components/StepIndicator";
 import ChatLayout from "../Components/ChatLayout";
 import welfyImg from "../assets/images/welfy_origin.png";
 import { LoadingWelfyAvatar } from "../Components/LoadingWelfy";
@@ -88,8 +87,6 @@ export default function ChatPage() {
   return (
     <ChatLayout>
       <div className="chat-container">
-        {messages.length > 0 && <StepIndicator current={3} />}
-
         {messages.length === 0 && (
           <div className="intro-wrapper">
             <img src={welfyImg} alt="welfy" className="intro-welfy" />
