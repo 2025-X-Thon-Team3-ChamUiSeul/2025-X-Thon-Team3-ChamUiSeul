@@ -139,6 +139,7 @@ export default function InfoForm() {
 
       const updatedUser = await response.json();
       console.log("User profile updated successfully:", updatedUser);
+      localStorage.setItem('userName', updatedUser.username); // Update username in localStorage
       navigate("/chat"); // 정보 저장 후 채팅 화면으로 이동
     } catch (error) {
       console.error("Error updating user profile:", error);
