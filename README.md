@@ -64,3 +64,5 @@
 | **FE** | 황서진 |
 | **BE, PM** | 김성진 | 
 | **BE** | 유수빈 |
+
+<img width="1824" height="1082" alt="image" src="https://github.com/user-attachments/assets/dad4c1e5-420e-4f2d-b220-8162f28a2bcd" />
