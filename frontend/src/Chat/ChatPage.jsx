@@ -170,8 +170,51 @@ export default function ChatPage() {
     }
   };
 
+  const handleDeleteChat = async (chatId) => {
+    if (!window.confirm("정말로 이 대화를 삭제하시겠습니까?")) {
+      return;
+    }
+
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+
+    try {
+      const response = await fetch(`http://localhost:8000/chats/${chatId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("서버에서 채팅을 삭제하지 못했습니다.");
+      }
+      
+      // Visually remove the chat from the list immediately for better UX
+      setSessions(prevSessions => prevSessions.filter(session => session.id !== chatId));
+
+      // If the currently active chat is the one being deleted, clear the chat view
+      if (currentChatId === chatId) {
+        setMessages([]);
+        setCurrentChatId(null);
+      }
+      
+      // Silently refetch sessions in the background to ensure sync with the server
+      fetchSessions();
+
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
+      alert("채팅 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
-    <ChatLayout handleNewChat={handleNewChat} sessions={sessions} loadChat={loadChat}>
+    <ChatLayout 
+      handleNewChat={handleNewChat} 
+      sessions={sessions} 
+      loadChat={loadChat}
+      handleDeleteChat={handleDeleteChat}
+    >
       <div className="chat-container">
         {messages.length === 0 && (
           <div className="intro-wrapper">

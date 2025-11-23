@@ -1,7 +1,7 @@
 # backend/app/routers/chat.py
 
 import os
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List, Optional
@@ -144,3 +144,25 @@ def post_chat_message(
     db.refresh(chat)
 
     return {"response": ai_response}
+
+
+# 5. 채팅 삭제
+@router.delete("/{chat_id}", status_code=status.HTTP_200_OK)
+def delete_chat(
+    chat_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    chat_to_delete = (
+        db.query(Chat)
+        .filter(Chat.id == chat_id, Chat.user_id == current_user.id)
+        .first()
+    )
+
+    if not chat_to_delete:
+        raise HTTPException(status_code=404, detail="Chat not found")
+
+    db.delete(chat_to_delete)
+    db.commit()
+
+    return {"message": "Chat deleted successfully"}

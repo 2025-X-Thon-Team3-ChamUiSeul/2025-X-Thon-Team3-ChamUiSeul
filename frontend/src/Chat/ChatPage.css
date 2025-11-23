@@ -46,14 +46,18 @@
   max-width: 350px;
 }
 
-.bubble.bot {
-  background: white;
-  border: 3px solid #123B66;
+.bubble.user {
+  background-color: #b5dbff;
+  color: #123b66;
+  border-radius: 18px 18px 4px 18px;
+  max-width: 75%;
 }
 
-.bubble.user {
-  background: white;
-  border: 3px solid #A8C7FF;
+.bubble.bot {
+  background-color: #f0f8ff;
+  color: #123b66;
+  border-radius: 18px 18px 18px 4px;
+  max-width: 75%;
 }
 
 /* 입력창 */

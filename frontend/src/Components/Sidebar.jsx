@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import welfyLogo from "../assets/images/welfy_logo.png";
 
 // 충돌 마커를 제거하고 필요한 모든 props를 통합했습니다.
-export default function Sidebar({ handleNewChat, sessions, loadChat }) {
+export default function Sidebar({ handleNewChat, sessions, loadChat, handleDeleteChat }) {
   const navigate = useNavigate(); // useNavigate 훅은 내 정보 버튼에서 사용될 수 있으므로 유지
   const [visibleCount, setVisibleCount] = useState(5); // 채팅 목록 더보기에 사용
 
@@ -84,27 +84,54 @@ export default function Sidebar({ handleNewChat, sessions, loadChat }) {
           }}
         >
           {sessions && sessions.slice(0, visibleCount).map((session) => (
-            <button
+            <div 
               key={session.id}
               onClick={() => loadChat(session.id)}
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
                 backgroundColor: "#F0F8FF",
                 border: "none",
                 borderRadius: "6px",
                 color: "#123B66",
-                padding: "10px",
+                padding: "10px 12px",
                 textAlign: "left",
                 cursor: "pointer",
-                fontSize: "16px",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
                 width: "100%",
                 marginBottom: "5px",
               }}
             >
-              {session.title}
-            </button>
+              <span style={{ 
+                flex: 1, // Take up available space
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                fontSize: "16px",
+              }}>
+                {session.title}
+              </span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent parent onClick
+                  if (handleDeleteChat) { // Ensure the function is passed
+                    handleDeleteChat(session.id);
+                  }
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#CC0000',
+                  cursor: 'pointer',
+                  fontSize: '22px', // Increased size
+                  fontWeight: 'bold',
+                  padding: '0 4px 0 8px',
+                  lineHeight: 1,
+                }}
+              >
+                ×
+              </button>
+            </div>
           ))}
         </div>
         

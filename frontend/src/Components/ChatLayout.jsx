@@ -1,10 +1,10 @@
 import Sidebar from "../Components/Sidebar";
 
-export default function ChatLayout({ children, handleNewChat, sessions, loadChat }) {
+export default function ChatLayout({ children, handleNewChat, sessions, loadChat, handleDeleteChat }) {
   return (
     <div style={{ display: "flex", height: "100vh", width: "100vw" }}>
       {/* 왼쪽 사이드바 */}
-      <Sidebar handleNewChat={handleNewChat} sessions={sessions} loadChat={loadChat} />
+      <Sidebar handleNewChat={handleNewChat} sessions={sessions} loadChat={loadChat} handleDeleteChat={handleDeleteChat} />
 
       {/* 오른쪽 페이지 내용 */}
       <div
