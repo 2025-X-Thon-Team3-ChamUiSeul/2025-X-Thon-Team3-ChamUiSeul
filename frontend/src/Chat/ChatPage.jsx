@@ -250,12 +250,10 @@ export default function ChatPage() {
           </div>
         </div>
         
-        {progressList && progressList.length > 0 && (
-          <ProgressTracker 
-            progress={progressList[0]} 
-            onCompleteStep={handleCompleteStep} 
-          />
-        )}
+        <ProgressTracker 
+          progress={progressList.length > 0 ? progressList[0] : null} 
+          onCompleteStep={handleCompleteStep} 
+        />
       </div>
     </ChatLayout>
   );

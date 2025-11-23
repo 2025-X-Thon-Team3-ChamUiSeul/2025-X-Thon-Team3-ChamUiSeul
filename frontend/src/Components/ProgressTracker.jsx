@@ -1,11 +1,13 @@
 // src/Components/ProgressTracker.jsx
 import React from "react";
 
-const Step = ({ index, currentStep, isLast }) => {
-  // A step is active (completed) if its number is less than the current step.
-  const isActive = index + 1 < currentStep; 
-  // A step is current if its number matches the current step.
+const Step = ({ index, currentStep, isLast, isInitialState }) => {
+  const isActive = index + 1 < currentStep;
   const isCurrent = index + 1 === currentStep;
+
+  // When in initial state (currentStep === 0), all steps are inactive
+  const backgroundColor = isInitialState || !isActive ? "#E0E0E0" : "#123B66";
+  const textColor = isInitialState || !isActive ? "#123B66" : "white";
 
   return (
     <div style={{ display: "flex", alignItems: "center", flexDirection: "column", alignSelf: 'stretch' }}>
@@ -14,8 +16,8 @@ const Step = ({ index, currentStep, isLast }) => {
           width: "24px",
           height: "24px",
           borderRadius: "50%",
-          backgroundColor: isActive ? "#123B66" : "#E0E0E0",
-          color: isActive ? "white" : "#123B66",
+          backgroundColor: backgroundColor,
+          color: textColor,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -32,7 +34,7 @@ const Step = ({ index, currentStep, isLast }) => {
           style={{
             width: "4px",
             height: "40px",
-            backgroundColor: isActive ? "#123B66" : "#E0E0E0",
+            backgroundColor: backgroundColor,
             marginTop: '4px',
             marginBottom: '4px',
             transition: 'background-color 0.3s ease',
@@ -44,13 +46,18 @@ const Step = ({ index, currentStep, isLast }) => {
 };
 
 export default function ProgressTracker({ progress, onCompleteStep }) {
-  if (!progress) {
-    return null;
-  }
+  const isInitialState = !progress || progress.current_step === 0;
+  const isCompleted = progress && progress.current_step >= progress.total_steps;
 
-  const { progress_id, welfare_title, total_steps, current_step, next_action } = progress;
-  const isInitialState = current_step === 0;
-  const isCompleted = current_step >= total_steps;
+  const title = progress ? progress.welfare_title : "진행 상황";
+  const nextActionText = progress ? progress.next_action : "아직 진행 중인 신청이 없습니다.";
+  const buttonText = isInitialState ? "신청 시작하기" : (isCompleted ? '완료됨' : '완료했어요');
+
+  const handleButtonClick = () => {
+    if (progress && onCompleteStep) {
+      onCompleteStep(progress.progress_id);
+    }
+  };
 
   return (
     <div
@@ -66,22 +73,28 @@ export default function ProgressTracker({ progress, onCompleteStep }) {
         height: '100vh',
         boxSizing: 'border-box',
         justifyContent: 'space-between',
+        boxShadow: 'inset 1px 0 3px rgba(0,0,0,0.05)',
       }}
     >
       <div>
-        <h3 style={{ margin: 0, marginBottom: "10px", textAlign: 'center' }}>{welfare_title}</h3>
-        <p style={{ fontSize: "14px", color: '#555', marginBottom: '30px', textAlign: 'center' }}>신청 진행 현황</p>
+        <h3 style={{ margin: 0, marginBottom: "10px", textAlign: 'center' }}>{title}</h3>
+        <p style={{ fontSize: "14px", color: '#555', marginBottom: '30px', textAlign: 'center' }}>
+          {progress ? "신청 진행 현황" : "현재 진행 중인 신청이 없습니다."}
+        </p>
         
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '30px' }}>
-          {Array.from({ length: total_steps }).map((_, index) => (
-            <Step
-              key={index}
-              index={index}
-              currentStep={current_step}
-              isLast={index === total_steps - 1}
-            />
-          ))}
-        </div>
+        {progress && progress.total_steps > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '30px' }}>
+            {Array.from({ length: progress.total_steps }).map((_, index) => (
+              <Step
+                key={index}
+                index={index}
+                currentStep={progress.current_step}
+                isLast={index === progress.total_steps - 1}
+                isInitialState={isInitialState}
+              />
+            ))}
+          </div>
+        )}
         
         <div style={{ textAlign: 'center', width: '100%' }}>
             <h4 style={{ marginBottom: '10px' }}>
@@ -92,30 +105,32 @@ export default function ProgressTracker({ progress, onCompleteStep }) {
                 padding: '15px', 
                 borderRadius: '8px', 
                 fontSize: '14px',
-                minHeight: '60px'
+                minHeight: '60px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
               }}
             >
-              {next_action}
+              {nextActionText}
             </p>
         </div>
       </div>
 
       <button
-        onClick={() => onCompleteStep(progress_id)}
-        disabled={isCompleted}
+        onClick={handleButtonClick}
+        disabled={isCompleted && !isInitialState} // Only disable if completed AND not initial state
         style={{
             width: '100%',
             padding: '12px',
-            backgroundColor: isCompleted ? '#B0B0B0' : '#123B66',
+            backgroundColor: (isCompleted && !isInitialState) ? '#B0B0B0' : '#123B66',
             color: 'white',
             border: 'none',
             borderRadius: '8px',
-            cursor: isCompleted ? 'not-allowed' : 'pointer',
+            cursor: (isCompleted && !isInitialState) ? 'not-allowed' : 'pointer',
             fontSize: '16px',
             transition: 'background-color 0.2s ease',
+            fontWeight: 'bold',
         }}
       >
-          {isInitialState ? "신청 시작하기" : (isCompleted ? '완료됨' : '완료했어요')}
+          {buttonText}
       </button>
     </div>
   );
