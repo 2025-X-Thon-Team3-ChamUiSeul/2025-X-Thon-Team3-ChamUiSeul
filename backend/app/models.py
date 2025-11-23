@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
 from sqlalchemy.orm import relationship
-from .database import Base
+from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
+Base = declarative_base()
 
 # 1. 사용자 테이블 (로그인 정보, 프로필)
 class User(Base):
@@ -20,7 +21,7 @@ class User(Base):
     school = Column(String, nullable=True)  # 학교
     # ---------------------------
 
-    chats = relationship("ChatHistory", back_populates="user")
+    chats = relationship("Chat", back_populates="user")  # 수정된 부분
     progresses = relationship("UserWelfareProgress", back_populates="user")
 
 
@@ -66,13 +67,25 @@ class UserWelfareProgress(Base):
     welfare = relationship("Welfare", back_populates="progresses")
 
 
-# 4. 채팅 기록 테이블
-class ChatHistory(Base):
-    __tablename__ = "chat_histories"
+# 4. 채팅 세션 테이블 (어떤 대화인가)
+class Chat(Base):
+    __tablename__ = "chats"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
+    title = Column(String, default="새로운 대화")
+    created_at = Column(DateTime, default=datetime.now)
+
+    user = relationship("User", back_populates="chats")
+    messages = relationship("ChatMessage", back_populates="chat", cascade="all, delete-orphan")
+
+
+# 5. 채팅 메시지 테이블 (무슨 말을 했나)
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+    id = Column(Integer, primary_key=True, index=True)
+    chat_id = Column(Integer, ForeignKey("chats.id"))
     message = Column(Text)
     response = Column(Text)
     timestamp = Column(DateTime, default=datetime.now)
 
-    user = relationship("User", back_populates="chats")
+    chat = relationship("Chat", back_populates="messages")
