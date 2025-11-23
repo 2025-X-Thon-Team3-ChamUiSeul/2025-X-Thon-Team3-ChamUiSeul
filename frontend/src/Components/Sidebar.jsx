@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
+=======
+import welfyLogo from "../assets/images/welfy_logo.png";
+>>>>>>> 559f9a89 (fix: design)
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -13,9 +17,11 @@ export default function Sidebar() {
         color: "#123B66",
       }}
     >
-      <h1 style={{ fontSize: "36px", fontWeight: "bold", marginBottom: "40px" }}>
-        Welfy
-      </h1>
+      <img
+        src={welfyLogo}
+        alt="Welfy 로고"
+        style={{ width: "200px", height: "auto", marginBottom: "40px" }}
+      />
 
       <nav style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
         <div style={{ fontSize: "20px" }}>새 채팅</div>

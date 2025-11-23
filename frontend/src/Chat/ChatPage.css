@@ -112,3 +112,41 @@
 .input-bar.intro-bottom {
   margin-top: 120px;  /* 원하는 만큼 조절 가능 */
 }
+
+/* --- 로딩 말풍선 --- */
+.bubble.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 80px;
+  background: #f4f8ff;
+  border-color: #123B66;
+}
+
+.loading-dot {
+  width: 8px;
+  height: 8px;
+  background: #123B66;
+  border-radius: 50%;
+  animation: loadingBlink 1.2s infinite ease-in-out;
+}
+
+.loading-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes loadingBlink {
+  0%, 80%, 100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}

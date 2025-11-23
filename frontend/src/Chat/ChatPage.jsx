@@ -1,8 +1,8 @@
 // src/Chat/ChatPage.jsx
 import { useState, useEffect } from "react";
-import StepIndicator from "../Components/StepIndicator";
 import ChatLayout from "../Components/ChatLayout";
 import welfyImg from "../assets/images/welfy_origin.png";
+import { LoadingWelfyAvatar } from "../Components/LoadingWelfy";
 import "./ChatPage.css";
 
 export default function ChatPage() {
@@ -87,8 +87,6 @@ export default function ChatPage() {
   return (
     <ChatLayout>
       <div className="chat-container">
-        {messages.length > 0 && <StepIndicator current={3} />}
-
         {messages.length === 0 && (
           <div className="intro-wrapper">
             <img src={welfyImg} alt="welfy" className="intro-welfy" />
@@ -100,7 +98,6 @@ export default function ChatPage() {
             </div>
           </div>
         )}
-
         {messages.length > 0 && (
           <div className="messages">
             {messages.map((msg, idx) => (
@@ -114,6 +111,20 @@ export default function ChatPage() {
                 <div className={`bubble ${msg.sender}`}>{msg.text}</div>
               </div>
             ))}
+            {isLoading && (
+              <div className="msg bot">
+                <LoadingWelfyAvatar
+                  interval={350}
+                  size={55}
+                  className="welfy-icon"
+                />
+                <div className="bubble bot loading">
+                  <span className="loading-dot" />
+                  <span className="loading-dot" />
+                  <span className="loading-dot" />
+                </div>
+              </div>
+            )}
           </div>
         )}
 
