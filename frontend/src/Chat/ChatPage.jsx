@@ -84,8 +84,12 @@ export default function ChatPage() {
     }
   };
 
+  const handleNewChat = () => {
+    setMessages([]);
+  };
+
   return (
-    <ChatLayout>
+    <ChatLayout handleNewChat={handleNewChat}>
       <div className="chat-container">
         {messages.length === 0 && (
           <div className="intro-wrapper">
