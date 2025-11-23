@@ -9,9 +9,7 @@ export default function Sidebar({ handleNewChat, sessions, loadChat }) {
 
   // 내 정보 버튼 클릭 핸들러 (Router가 설정되어 있다면 경로를 이용해 이동)
   const handleMyInfoClick = () => {
-    // 예시: /my-info 경로로 이동
-    // navigate("/my-info"); 
-    console.log("내 정보 clicked");
+    navigate("/info"); 
   };
 
   return (
@@ -88,7 +86,7 @@ export default function Sidebar({ handleNewChat, sessions, loadChat }) {
           {sessions && sessions.slice(0, visibleCount).map((session) => (
             <button
               key={session.id}
-              onClick={() => loadChat(session)}
+              onClick={() => loadChat(session.id)}
               style={{
                 backgroundColor: "#F0F8FF",
                 border: "none",

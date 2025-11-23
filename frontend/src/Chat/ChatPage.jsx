@@ -9,10 +9,10 @@ export default function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [userName, setUserName] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // ⬅️ 로딩 상태 추가
-  const [sessions, setSessions] = useState([]); // New state for sessions
+  const [isLoading, setIsLoading] = useState(false);
+  const [sessions, setSessions] = useState([]);
+  const [currentChatId, setCurrentChatId] = useState(null);
 
-  // 컴포넌트가 처음 로드될 때 URL에서 토큰과 유저 정보를 추출합니다.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
@@ -20,133 +20,146 @@ export default function ChatPage() {
     const email = params.get("email");
 
     if (token) {
-      // 토큰과 유저 정보를 로컬 스토리지에 저장하여 로그인 상태를 유지합니다.
       localStorage.setItem("authToken", token);
       localStorage.setItem("userName", name);
       localStorage.setItem("userEmail", email);
-
-      setUserName(name); // 상태 업데이트
-
-      // URL에서 토큰 정보를 제거하여 주소를 깔끔하게 정리합니다.
+      setUserName(name);
       window.history.replaceState({}, document.title, "/chat");
     } else {
-      // 페이지 새로고침 시 로컬 스토리지에서 유저 정보 불러오기
       const storedName = localStorage.getItem("userName");
       if (storedName) {
         setUserName(storedName);
       }
     }
     
-    fetchHistory();
+    fetchSessions();
   }, []);
 
-  const fetchHistory = useCallback(async () => {
+  const fetchSessions = useCallback(async () => {
     const token = localStorage.getItem("authToken");
     if (!token) return;
 
     try {
-      const response = await fetch("http://localhost:8000/chat/history", {
+      const response = await fetch("http://localhost:8000/chats/", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const history = await response.json();
-      processHistory(history);
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      setSessions(data);
     } catch (error) {
-      console.error("Failed to fetch chat history:", error);
+      console.error("Failed to fetch chat sessions:", error);
     }
   }, []);
 
-  const processHistory = (history) => {
-    if (!history || history.length === 0) {
-      setSessions([]);
-      return;
+  const loadChat = useCallback(async (chatId) => {
+    if (!chatId) return;
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(`http://localhost:8000/chats/${chatId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      
+      const formattedMessages = data.flatMap(item => [
+        { sender: 'user', text: item.message },
+        { sender: 'bot', text: item.response }
+      ]);
+      setMessages(formattedMessages);
+      setCurrentChatId(chatId);
+    } catch (error) {
+      console.error("Failed to load chat messages:", error);
+    } finally {
+      setIsLoading(false);
     }
+  }, []);
 
-    const sortedHistory = [...history].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  const handleNewChat = useCallback(async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+    
+    try {
+        setIsLoading(true);
+        const response = await fetch("http://localhost:8000/chats/", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const newChat = await response.json();
 
-    const sessionGroups = [];
-    if (sortedHistory.length > 0) {
-        // Start first session
-        let currentSession = { id: sortedHistory[0].id, title: sortedHistory[0].message, messages: [] };
-        sessionGroups.push(currentSession);
+        await fetchSessions(); // Refresh session list
+        setMessages([]);
+        setCurrentChatId(newChat.id); // Set the new chat as active
+        return newChat.id;
+    } catch (error) {
+        console.error("Failed to create new chat:", error);
+    } finally {
+        setIsLoading(false);
+    }
+  }, [fetchSessions]);
 
-        for (let i = 0; i < sortedHistory.length; i++) {
-            const item = sortedHistory[i];
+  const sendMessage = async () => {
+    if (!input.trim() || isLoading) return;
 
-            if (i > 0) {
-                const prevTimestamp = new Date(sortedHistory[i - 1].timestamp);
-                const currentTimestamp = new Date(item.timestamp);
-                const diffMinutes = (currentTimestamp - prevTimestamp) / (1000 * 60);
+    let chatId = currentChatId;
+    const isFirstMessage = messages.length === 0;
 
-                if (diffMinutes > 60) {
-                    // Time gap is large, start a new session
-                    currentSession = { id: item.id, title: item.message, messages: [] };
-                    sessionGroups.push(currentSession);
-                }
-            }
-            // Add message pair to the current session (the last one in the array)
-            currentSession.messages.push({ sender: 'user', text: item.message });
-            currentSession.messages.push({ sender: 'bot', text: item.response });
+    // If this is the very first message in a new session
+    if (!chatId) {
+        const newChatId = await handleNewChat();
+        if (newChatId) {
+            chatId = newChatId;
+        } else {
+            // Handle error in creating new chat
+            const errorMsg = { sender: "bot", text: "새로운 대화를 시작하는 데 실패했어요." };
+            setMessages([errorMsg]);
+            return;
         }
     }
 
-    setSessions(sessionGroups.reverse());
-  };
-
-  const loadChat = (session) => {
-    setMessages(session.messages);
-  };
-
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return; // ⬅️ 로딩 중이면 전송 방지
-
-    const isNewChat = messages.length === 0;
-
     const userMsg = { sender: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
+    const currentInput = input;
     setInput("");
-    setIsLoading(true); // ⬅️ 로딩 시작
+    setIsLoading(true);
 
-    // 웰피의 답장을 받기 위한 API 호출
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:8000/chat/message", {
+      const response = await fetch(`http://localhost:8000/chats/${chatId}/messages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // ⬅️ 헤더에 토큰 추가
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: currentInput }),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
-      const botMsg = { sender: "bot", text: data.response }; // ⬅️ API 응답 사용
+      const botMsg = { sender: "bot", text: data.response };
       setMessages((prev) => [...prev, botMsg]);
 
-      if (isNewChat) {
-        await fetchHistory();
+      // Refresh session list if it was the first message, so the title updates
+      if (isFirstMessage) {
+          fetchSessions();
       }
 
     } catch (error) {
       console.error("API Error:", error);
-      const errorMsg = {
-        sender: "bot",
-        text: "죄송해요, 답변을 생성하는 중에 오류가 발생했어요.",
-      };
+      const errorMsg = { sender: "bot", text: "죄송해요, 답변을 생성하는 중에 오류가 발생했어요." };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
-      setIsLoading(false); // ⬅️ 로딩 종료
+      setIsLoading(false);
     }
   };
 
@@ -157,10 +170,6 @@ export default function ChatPage() {
     }
   };
 
-  const handleNewChat = () => {
-    setMessages([]);
-  };
-
   return (
     <ChatLayout handleNewChat={handleNewChat} sessions={sessions} loadChat={loadChat}>
       <div className="chat-container">
@@ -168,7 +177,6 @@ export default function ChatPage() {
           <div className="intro-wrapper">
             <img src={welfyImg} alt="welfy" className="intro-welfy" />
             <div className="intro-text">
-              {/* ⬅️ 로그인한 유저 이름 표시 */}
               {userName ? `${userName}님, 안녕하세요!` : "안녕하세요!"}
               <br />
               서류의 숲에서 웰피가 길을 찾아줄게요.

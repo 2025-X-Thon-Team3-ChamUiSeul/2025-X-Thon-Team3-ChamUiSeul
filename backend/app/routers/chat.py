@@ -135,9 +135,12 @@ def post_chat_message(
     db.add(new_message)
 
     # 첫 메시지인 경우, 채팅방 제목을 해당 메시지로 업데이트
-    if len(chat.messages) == 0:
+    existing_messages_count = db.query(ChatMessage).filter(ChatMessage.chat_id == chat_id).count()
+    if existing_messages_count == 0:
         chat.title = request.message
-
+    
     db.commit()
+    db.refresh(new_message)
+    db.refresh(chat)
 
     return {"response": ai_response}
