@@ -1,5 +1,5 @@
 // src/Chat/ChatPage.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import ChatLayout from "../Components/ChatLayout";
 import welfyImg from "../assets/images/welfy_origin.png";
 import { LoadingWelfyAvatar } from "../Components/LoadingWelfy";
@@ -40,7 +40,7 @@ export default function ChatPage() {
     fetchHistory();
   }, []);
 
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     const token = localStorage.getItem("authToken");
     if (!token) return;
 
@@ -61,7 +61,7 @@ export default function ChatPage() {
     } catch (error) {
       console.error("Failed to fetch chat history:", error);
     }
-  };
+  }, []);
 
   const processHistory = (history) => {
     if (!history || history.length === 0) {
